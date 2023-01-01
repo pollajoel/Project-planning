@@ -1,0 +1,67 @@
+version: "3.7"
+services:
+  traefik:
+    container_name: traefikecommerce
+    # The official v2.8 Traefik docker image
+    image: traefik:v2.7
+    # Enables the web UI and tells Traefik to listen to docker
+    command:
+      --api.insecure=true
+      --providers.docker
+    #      --entrypoints.websecure.address=:443
+    ports:
+      # The HTTP port
+      - "80:80"
+      # The Web UI (enabled by --api.insecure=true)
+      - "8088:8080"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+  www.ecommerce.dev:
+    build: .
+    environment:
+      APP_ENV: 'dev'
+      APP_SECRET: 92b055afc9e8863a250e61d341fe2cf8
+      CORS_ALLOW_ORIGIN: "*"
+      ENABLE_SSL: "false"
+    ports:
+      - "9001:80"
+    labels:
+      - "traefik.http.routers.appeshop.rule=Host(`app.eshop.dev`)"
+    volumes:
+      - .:/var/www/html/
+
+
+  www.phpmyadmin.ecommerce.dev:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      MYSQL_USERNAME: eshop_userv_user
+    links:
+      - "sql.ecommerce.dev:db"
+    restart: always
+    labels:
+      - "traefik.http.routers.phpmyadminecommerce.rule=Host(`www.phpmyadmin.ecommerce.dev`)"
+
+  sql.ecommerce.dev:
+    container_name: sql.eshop.dev
+    image: mysql:5.6.50
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: test
+      MYSQL_DATABASE: eshop_user_dev
+      MYSQL_USER: eshop_userv_user
+      MYSQL_PASSWORD: eshop_serv_pwd
+    volumes:
+      - mysql-vol:/var/lib/mysql
+    labels:
+      - 'no-jenkins'
+    ports:
+      - "3306:3306"
+volumes:
+  mysql-vol:
+  redis-session-vol:
+  odoo-web-data:
+  odoo-db-data:
+###> doctrine/doctrine-bundle ###
+  db-data:
+###< doctrine/doctrine-bundle ###
