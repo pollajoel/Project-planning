@@ -42,8 +42,8 @@ class AddressController extends AbstractController
             return $this->json($address, response::HTTP_CREATED, [], ["groups" => "address:read"]);
         } catch (NotEncodableValueException $e) {
             return $this->json([
-                'status'  => 400,
-                "message" => $e->getMessage()
+                'status'  => Response::HTTP_BAD_REQUEST,
+                'message' => $e->getMessage()
             ]);
         }
     }
