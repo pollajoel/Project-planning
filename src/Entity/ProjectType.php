@@ -4,11 +4,11 @@ namespace App\Entity;
 
 use App\Repository\ProjectTypeRepository;
 use Doctrine\ORM\Mapping as ORM;
-use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * @ORM\Entity(repositoryClass=ProjectTypeRepository::class)
- * @ApiResource()
+ * @UniqueEntity("typeName")
  */
 class ProjectType
 {

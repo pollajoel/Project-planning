@@ -4,13 +4,12 @@ namespace App\Entity;
 
 use App\Repository\ProjectsRepository;
 use Doctrine\ORM\Mapping as ORM;
-use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
-
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * @ORM\Entity(repositoryClass=ProjectsRepository::class)
- * @ApiResource
+ *  @UniqueEntity("projectName")
  */
 class Projects
 {
@@ -32,7 +31,8 @@ class Projects
     /**
      * @ORM\Column(type="datetime")
      * @Assert\NotBlank
-     *  @Groups("project:read")
+     * @Groups("project:read")
+     * @Assert\LessThanOrEqual(propertyPath="endDate", message="The date must be later than the end date")
      */
     private $start_date;
 
@@ -40,6 +40,7 @@ class Projects
      * @ORM\Column(type="datetime")
      * @Assert\NotBlank
      * @Groups("project:read")
+     * @Assert\GreaterThan(propertyPath="start_date", message="The date must be greater than the start date")
      */
     private $end_date;
 
@@ -50,6 +51,16 @@ class Projects
      * @Groups("project:read")
      */
     private $project_type;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="projects_user_work")
+     */
+    private $users;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="projects_user_manage")
+     */
+    private $manager;
 
     public function getId(): ?int
     {
@@ -100,6 +111,30 @@ class Projects
     public function setProjectType(ProjectType $project_type): self
     {
         $this->project_type = $project_type;
+
+        return $this;
+    }
+
+    public function getUsers(): ?User
+    {
+        return $this->users;
+    }
+
+    public function setUsers(?User $users): self
+    {
+        $this->users = $users;
+
+        return $this;
+    }
+
+    public function getManager(): ?User
+    {
+        return $this->manager;
+    }
+
+    public function setManager(?User $manager): self
+    {
+        $this->manager = $manager;
 
         return $this;
     }

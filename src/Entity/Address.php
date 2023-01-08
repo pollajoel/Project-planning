@@ -3,13 +3,11 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use ApiPlatform\Core\Annotation\ApiResource;
+
 use Symfony\Component\Serializer\Annotation\Groups;
 use App\Repository\AddressRepository;
 
-
 /**
- * @ApiResource
  * @ORM\Entity(repositoryClass=AddressRepository::class)
  * 
  */
@@ -64,6 +62,7 @@ class Address
     public function getPhone(): ?string
     {
         return $this->phone;
+
     }
 
     public function setPhone(string $phone): self

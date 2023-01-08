@@ -64,7 +64,7 @@ class ProjectsController extends AbstractController
      */
     public function getProjects()
     {
-        return $this->json($this->projectRepository->findAll(), Response::HTTP_OK, [], ["groups"=>"project:read"]);
+        return $this->json($this->projectRepository->findAll(), Response::HTTP_OK, [], ["groups" => "project:read"]);
     }
 
     /**
@@ -80,7 +80,7 @@ class ProjectsController extends AbstractController
         if (count($projects) > 0) {
             return $this->json($projects, Response::HTTP_OK, [],  []);
         } else {
-            return  $this->json($projects, Response::HTTP_NOT_FOUND,[], []);
+            return  $this->json($projects, Response::HTTP_NOT_FOUND, [], []);
         }
     }
 
@@ -104,7 +104,7 @@ class ProjectsController extends AbstractController
 
             $this->entityManager->persist($project);
             $this->entityManager->flush();
-            return $this->json($project, Response::HTTP_CREATED, [], ["groups"=>"project:read"]);
+            return $this->json($project, Response::HTTP_CREATED, [], ["groups" => "project:read"]);
         } catch (NotEncodableValueException $e) {
             return $this->json(
                 [
@@ -117,12 +117,19 @@ class ProjectsController extends AbstractController
 
     /**
      * Update project by Id
+     * 
      * @Route("/api/project/{id}", name="app_update_project", methods={"PUT"})
      * @param Request $request
      * @return Response
      */
     public function updateProject(Request $request, $id)
     {
+        /**
+         * @var string|resource $requestParams
+         * @var Projects[] $project
+         * @var Projects $projectNew
+         */
+
         $requestParams = $request->getContent();
         $project = $this->projectRepository->findBy(array('id' => (int)$id));
 
@@ -130,29 +137,26 @@ class ProjectsController extends AbstractController
 
             try {
 
-                $projectNew = $this->serializer->deserialize($requestParams, projects::class, "json", []);
+                $projectNew = $this->serializer->deserialize($requestParams, projects::class, 'json', []);
                 $errors = $this->validator->validate($projectNew);
                 if (count($errors) > 0) {
                     return $this->json($errors, Response::HTTP_BAD_REQUEST, [], []);
                 }
-                $this->entityManager->remove( $this->serialize->serialize($project));
-                $this->entityManager->persist( $projectNew );
+
+                $this->entityManager->remove($project[0]);
+                $this->entityManager->persist($projectNew);
                 $this->entityManager->flush();
                 return $this->json($project, Response::HTTP_CREATED, [], []);
-
-            }catch(NotEncodableValueException $e){
+            } catch (NotEncodableValueException $e) {
                 return $this->json(
                     [
-                        "status" =>  Response::HTTP_BAD_REQUEST,
-                        "message" =>  $e->getMessage()
+                        'status' =>  Response::HTTP_BAD_REQUEST,
+                        'message' =>  $e->getMessage()
                     ]
                 );
             }
-
-
         } else {
-            return $this->json(["status" => Response::HTTP_NOT_FOUND,]);
+            return $this->json(['status' => Response::HTTP_NOT_FOUND,]);
         }
-
     }
 }
