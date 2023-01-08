@@ -57,6 +57,18 @@ services:
       - 'no-jenkins'
     ports:
       - "3306:3306"
+    
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    links:
+      - "sql.ecommerce.dev:db"
+    environment:
+      MYSQL_USERNAME: eshop_userv_user
+    restart: always
+    ports:
+      - "8083:80"
+
 volumes:
   mysql-vol:
   redis-session-vol:
