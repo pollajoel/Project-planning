@@ -1,22 +1,22 @@
 version: "3.7"
 services:
-  traefik:
-    container_name: traefikecommerce
-    # The official v2.8 Traefik docker image
-    image: traefik:v2.7
-    # Enables the web UI and tells Traefik to listen to docker
-    command:
-      --api.insecure=true
-      --providers.docker
-    #      --entrypoints.websecure.address=:443
-    ports:
-      # The HTTP port
-      - "80:80"
-      # The Web UI (enabled by --api.insecure=true)
-      - "8088:8080"
-    volumes:
-      # So that Traefik can listen to the Docker events
-      - /var/run/docker.sock:/var/run/docker.sock
+  # traefik:
+  #   container_name: traefikecommerce2
+  #   # The official v2.8 Traefik docker image
+  #   image: traefik:v2.7
+  #   # Enables the web UI and tells Traefik to listen to docker
+  #   command:
+  #     --api.insecure=true
+  #     --providers.docker
+  #   #      --entrypoints.websecure.address=:443
+  #   ports:
+  #     # The HTTP port
+  #     - "80:80"
+  #     # The Web UI (enabled by --api.insecure=true)
+  #     - "8000:8080"
+  #   volumes:
+  #     # So that Traefik can listen to the Docker events
+  #     - /var/run/docker.sock:/var/run/docker.sock
   www.ecommerce.dev:
     build: .
     environment:
@@ -25,7 +25,7 @@ services:
       CORS_ALLOW_ORIGIN: "*"
       ENABLE_SSL: "false"
     ports:
-      - "9001:80"
+      - "9006:80"
     labels:
       - "traefik.http.routers.appeshop.rule=Host(`app.eshop.dev`)"
     volumes:
@@ -43,7 +43,7 @@ services:
       - "traefik.http.routers.phpmyadminecommerce.rule=Host(`www.phpmyadmin.ecommerce.dev`)"
 
   sql.ecommerce.dev:
-    container_name: sql.eshop.dev
+    container_name: sql.eshop.dev2
     image: mysql:5.6.50
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
@@ -60,14 +60,14 @@ services:
     
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
+    container_name: phpmyadmin2
     links:
       - "sql.ecommerce.dev:db"
     environment:
       MYSQL_USERNAME: eshop_userv_user
     restart: always
     ports:
-      - "8083:80"
+      - "8089:80"
 
 volumes:
   mysql-vol:
